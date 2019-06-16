@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Bysykkel oppgave</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.0.min.js"></script>
+  </head>
+  <body>
+  <table>
+    <thead>
+      <tr>
+        <th>Stasjon</th>
+        <th>Tilgjengelige Låser</th>
+        <th>Ledige Sykler</th>
+      </tr>
+    </thead>
+    <tbody id="table">
+     <!--Her skal være informasjon-->
+    </tbody>
+  </table>
+  <script type="text/javascript">
+	$(document).ready(function(){
+  		var $arr=[]; /*First array for station information */
+  		var $arr2=[]; /*Second array for station Status */
+      var $html = "";
+    	$.ajax({
+    		type: 'GET', 
+  			url: 'https://gbfs.urbansharing.com/oslobysykkel.no/station_information.json', 
+  			dataType: 'json', 
+  			success: function(data) { 
+    			$.each(data.data.stations,function(index,element){
+    			 $arr.push(element);
+    			}); 
+    			$.ajax({
+    				type: 'GET', 
+  					url: 'https://gbfs.urbansharing.com/oslobysykkel.no/station_status.json', 
+  					dataType: 'json', 
+			  		success: function(data) { 
+			  			$.each(data.data.stations,function(index,element){
+    						$arr2.push(element);
+    					}); 
+              $.each($arr,function(index, element){
+                $val = $arr2.find(x => x.station_id == element.station_id);
+                $html += "<tr id="+element.station_id+"><td>"+element.name+"</td><td>"+$val.num_docks_available+"</td><td>"+$val.num_bikes_available+"</td></tr>";
+              });
+             $("#table").html($html);
+			  		}, 
+		  			error: function(data) { 
+		    			alert(data); 
+		  			} 
+    			});
+  			}, 
+  			error: function(data) { 
+    			alert(data); 
+  			} 
+    	});
+    });
+  </script>
+  </body>
+</html>
